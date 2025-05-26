@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { FaSearch, FaEnvelope, FaShoppingCart, FaUser, FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
+import { MdDashboard } from 'react-icons/md';
 
 export const Navbar = ()=> {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -48,7 +49,11 @@ const navlinks = (
 
               <FaSearch className="absolute right-3 top-2.5 text-gray-500" />
             </div>
-            <FaEnvelope className="hover:text-gray-200 cursor-pointer hidden md:block" />
+              <Link href="/dashboard" className="">
+    
+            <MdDashboard className="hover:text-gray-200 cursor-pointer hidden md:block" />
+              </Link>
+
             <FaShoppingCart className="hover:text-gray-200 cursor-pointer hidden md:block" />
             <FaUser className="hover:text-gray-200 cursor-pointer hidden md:block" />
 
