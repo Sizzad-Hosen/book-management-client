@@ -15,6 +15,8 @@ const navlinks = (
     <Link href="/sell" className="hover:text-gray-200">Sell</Link>
     <Link href="/message" className="hover:text-gray-200">Messages</Link>
     <Link href="/about" className="hover:text-gray-200">About Us</Link>
+    <Link href="/login" className="hover:text-gray-200">Login</Link>
+    <Link href="/register" className="hover:text-gray-200">Register</Link>
     
   
   </>
@@ -24,9 +26,9 @@ const navlinks = (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <div className="flex items-center gap-2 text-2xl font-bold">
+          <div className="flex  hover:text-gray-800 items-center gap-2 text-2xl font-bold">
             <span>📚</span>
-            <Link href="/" className="text-white text-xl font-semibold">BookSwap</Link>
+            <Link href="/" className="text-white text-3xl  font-bold">BookSwap</Link>
           </div>
 
           {/* Desktop Links */}

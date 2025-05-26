@@ -1,5 +1,6 @@
 import React from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { FaSearch } from 'react-icons/fa';
 
 const ExploreBooks = () => {
   return (
@@ -17,7 +18,7 @@ const ExploreBooks = () => {
       {/* Content container with relative positioning */}
       <div className="relative max-w-7xl mx-auto z-10">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-100 sm:text-4xl mb-4">Explore Our Books</h2>
+          <h2 className="text-6xl p-4 font-bold text-gray-100  mb-4">Explore Our Books</h2>
           <p className="text-xl text-gray-100 max-w-3xl mx-auto">
             Find your next favorite read from our extensive collection of books across various genres and categories
           </p>
@@ -31,10 +32,10 @@ const ExploreBooks = () => {
             <input
               type="text"
               placeholder="Search by title, author, or ISBN..."
-              className="block w-full pl-10 pr-3 py-4 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg"
+              className="block w-full pl-10 pr-3 py-4 border border-gray-300 rounded-full bg-white shadow-sm focus:outline-none text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg"
             />
-            <button className="absolute right-2.5 bottom-2.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors duration-300">
-              Search
+            <button className="absolute right-2.5 bottom-2.5 bg-gray-800 hover:bg-gray-900 text-white px-4 py-3 rounded-full transition-colors duration-300">
+              <FaSearch />
             </button>
           </div>
         </div>
