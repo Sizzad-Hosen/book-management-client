@@ -5,20 +5,30 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+import { useAddUserMutation } from '@/redux/features/user/userManagement.api';
+
 
 const RegisterForm = () => {
+
+  const [addUser]  = useAddUserMutation();
+
   const [formData, setFormData] = useState({
-    username: '',
+    name: '',
     email: '',
     password: '',
     role: 'buyer',
   });
+
+  console.log('fromdata', formData)
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+   
     const { name, value } = e.target;
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -30,22 +40,17 @@ const RegisterForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await addUser(formData);
+      console.log('result', response);
+   
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response?.data.success) {
         toast.success('Registration successful!');
         router.push('/login');
       } else {
-        toast.error(data.message || 'Registration failed');
+        toast.error(response?.data.message || 'Registration failed');
       }
+
     } catch (error) {
       toast.error('An error occurred during registration');
     } finally {
@@ -64,15 +69,15 @@ const RegisterForm = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md  space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-900">
-                Username
+              <label htmlFor="name" className="block text-sm font-medium text-gray-900">
+                Name
               </label>
               <input
-                id="username"
-                name="username"
+                id="name"
+                name="name"
                 type="text"
                 required
-                value={formData.username}
+                value={formData.name}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border text-gray-900 border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
