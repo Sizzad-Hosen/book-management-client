@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import { useAddUserMutation } from '@/redux/features/user/userManagement.api';
-
+import bcrypt from 'bcryptjs';
 
 const RegisterForm = () => {
 
@@ -40,6 +40,9 @@ const RegisterForm = () => {
     setIsLoading(true);
 
     try {
+      //   const salt = await bcrypt.genSalt(10);
+      // const hashedPassword = await bcrypt.hash(formData.password, salt);
+
       const response = await addUser(formData);
       console.log('result', response);
    

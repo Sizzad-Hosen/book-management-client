@@ -5,12 +5,24 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+import { useLoginMutation } from '@/redux/features/auth/authApi';
+import { useAppDispatch } from '@/redux/hook';
+import { setUser, TUser } from '@/redux/features/auth/authSlice';
+import { verifyToken } from '@/utils/verifyToken';
 
 const LoginForm = () => {
+
+  const [addLogin]  = useLoginMutation();
+
+  const dispatch = useAppDispatch();
+
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
   });
+
+  console.log('formdata', formData);
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -28,28 +40,42 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
 
-      const data = await response.json();
+        const res = await addLogin(formData);
 
-      if (response.ok) {
+       console.log('result', res);
+
+        const token = res?.data?.data?.accessToken;
+
+      console.log(token)
+     const user = verifyToken(res?.data?.data?.accessToken) as TUser;
+
+      if (!user) {
+      throw new Error('Invalid token');
+       }
+
+      dispatch(setUser({ user, token }));
+      
+      console.log('user',user);
+
+      console.log('token',token);
+      
+
+      if (res?.data.success) {
         toast.success('Login successful!');
-        router.push('/dashboard');
+        router.push('/');
       } else {
-        toast.error(data.message || 'Login failed');
+        toast.error(res?.data.message || 'Login failed');
       }
+
     } catch (error) {
-      toast.error('An error occurred during login');
+      toast.error('An error occurred during registration');
     } finally {
       setIsLoading(false);
     }
   };
+
+ 
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -62,19 +88,19 @@ const LoginForm = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
 
           <div className="rounded-md space-y-4">
-              <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-900">
-                Username
+             <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+                Email address
               </label>
               <input
-                id="username"
-                name="username"
-                type="text"
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
                 required
-                value={formData.username}
+                value={formData.email}
                 onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-
+                className="mt-1 block w-full px-3  text-gray-900 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
 
