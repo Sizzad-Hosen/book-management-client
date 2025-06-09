@@ -124,7 +124,7 @@ const BookForm = () => {
           {/* Genre */}
           <Input label="Genre (example: epic, tragedy, comedy, novel, and short story)" name="genre" type="text" onChange={handleChange} value={formData.genre} />
           {/* Publisher */}
-          <Input label="Publisher" name="publisher" type="text" onChange={handleChange} value={formData.publisher} />
+          <Input label="Publisher (give pushlisher name)" name="publisher" type="text" onChange={handleChange} value={formData.publisher} />
           {/* Series */}
           <Input label="Series (example: It is story book)" name="series" type="text" onChange={handleChange} value={formData.series} />
           {/* Language */}
