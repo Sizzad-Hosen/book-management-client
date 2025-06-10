@@ -3,6 +3,8 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { FaSearch } from 'react-icons/fa';
 
 const ExploreBooks = () => {
+
+  
   return (
     <section className="relative py-16 px-4 sm:px-6 lg:px-8">
       {/* Background image with overlay */}

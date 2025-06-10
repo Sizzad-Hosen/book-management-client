@@ -19,6 +19,8 @@ const navlinks = (
     <Link href="/login" className="hover:text-gray-200">Login</Link>
     <Link href="/register" className="hover:text-gray-200">Register</Link>
     
+    
+    
   
   </>
 );
@@ -82,6 +84,7 @@ const navlinks = (
               <FaEnvelope className="hover:text-gray-200 cursor-pointer" />
               <FaShoppingCart className="hover:text-gray-200 cursor-pointer" />
               <FaUser className="hover:text-gray-200 cursor-pointer" />
+          
             </div>
           </div>
         )}

@@ -1,115 +1,117 @@
 "use client";
 
-import { useState, useRef, ChangeEvent } from "react";
+import { useAddBookMutation } from "@/redux/features/book/bookManagement.api";
+import { useState, ChangeEvent } from "react";
+import toast from "react-hot-toast";
 
 const BookForm = () => {
-  const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    isbn: '',
-    genre: '',
-    publisher: '',
-    series: '',
-    language: '',
-    format: '',
-    pageCount: '',
-    releaseDate: '',
-    price: '',
-    quantity: '',
-    imageFile: null as File | null,
-    previewImage: '',
-  });
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [addBook] = useAddBookMutation();
+
+const [formData, setFormData] = useState({
+  title: 'The Great Gatsby',
+  author: 'F. Scott Fitzgerald',
+  isbn: '9780743273565',
+  genre: 'Novel',
+  publisher: 'Scribner',
+  series: '',
+  language: 'English',
+  format: 'hardcover', // must match one of the select options
+  pageCount: '180',
+  releaseDate: '1925-04-10',
+  price: '15.99',
+  quantity: '100',
+  image: null as File | null,
+  previewImage: '',
+});
+
+
+  console.log('formdata',formData)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+   
     const { name, value } = e.target;
+
     setFormData(prev => ({ ...prev, [name]: value }));
+  
   };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+   
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
+ const preview = URL.createObjectURL(file);
       // Set the file for upload
       setFormData(prev => ({
         ...prev,
-        imageFile: file
+        image: file,
+         previewImage: preview
       }));
 
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setFormData(prev => ({
-            ...prev,
-            previewImage: event.target?.result as string
-          }));
-        }
-      };
-      reader.readAsDataURL(file);
     }
+
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  const formdata = new FormData();
+
+  // Create a data object with all text fields
+  const bookData = {
+    title: formData.title,
+    author: formData.author,
+    isbn: formData.isbn,
+    genre: formData.genre,
+    publisher: formData.publisher,
+    series: formData.series,
+    language: formData.language,
+    format: formData.format,
+    pageCount: Number(formData.pageCount),
+    releaseDate: formData.releaseDate,
+    price: Number(formData.price),
+    quantity: Number(formData.quantity),
+  };
+
+  // Append the data as JSON string
+  formdata.append("data", JSON.stringify(bookData));
+
+  // Append file if exists
+  if (formData.image) {
+    formdata.append("file", formData.image);
+  }
+
+  try {
+    const response = await addBook(formdata); 
     
-    // Create FormData for file upload
-    const formDataToSend = new FormData();
-    formDataToSend.append('title', formData.title);
-    formDataToSend.append('author', formData.author);
-    formDataToSend.append('isbn', formData.isbn);
-    formDataToSend.append('genre', formData.genre);
-    formDataToSend.append('publisher', formData.publisher);
-    formDataToSend.append('series', formData.series);
-    formDataToSend.append('language', formData.language);
-    formDataToSend.append('format', formData.format);
-    formDataToSend.append('pageCount', formData.pageCount);
-    formDataToSend.append('releaseDate', formData.releaseDate);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('quantity', formData.quantity);
-    if (formData.imageFile) {
-      formDataToSend.append('image', formData.imageFile);
-    }
-
-    try {
-      const response = await fetch('/api/books', {
-        method: 'POST',
-        body: formDataToSend,
+    if (response.data?.success) {
+      toast('Book created successfully!');
+      // Reset form
+      setFormData({
+        title: '',
+        author: '',
+        isbn: '',
+        genre: '',
+        publisher: '',
+        series: '',
+        language: '',
+        format: '',
+        pageCount: '',
+        releaseDate: '',
+        price: '',
+        quantity: '',
+        image: null,
+        previewImage: '',
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Book created successfully!', data);
-        // Reset form
-        setFormData({
-          title: '',
-          author: '',
-          isbn: '',
-          genre: '',
-          publisher: '',
-          series: '',
-          language: '',
-          format: '',
-          pageCount: '',
-          releaseDate: '',
-          price: '',
-          quantity: '',
-          imageFile: null,
-          previewImage: '',
-        });
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-      } else {
-        console.error('Error creating book:', data.message);
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
+    } else {
+      console.error('Error creating book:', response.error);
     }
-  };
-
+  } catch (error) {
+    console.error('Error submitting form:', error);
+  }
+};
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64">
       <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -154,13 +156,15 @@ const BookForm = () => {
           <Input label="Quantity" name="quantity" type="number" required onChange={handleChange} value={formData.quantity} />
           
           {/* Image Upload */}
+
           <div>
+
             <label className="block text-sm font-medium text-gray-700 mb-1">Book Cover</label>
             <input
               type="file"
+              name="image"
               accept="image/*"
               onChange={handleImageChange}
-              ref={fileInputRef}
               className="block w-full text-sm text-gray-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
@@ -168,7 +172,9 @@ const BookForm = () => {
                 file:bg-indigo-50 file:text-indigo-700
                 hover:file:bg-indigo-100"
             />
+
             {formData.previewImage && (
+
               <div className="mt-2">
                 <img 
                   src={formData.previewImage} 
@@ -177,6 +183,7 @@ const BookForm = () => {
                 />
               </div>
             )}
+
           </div>
 
           {/* Submit */}
