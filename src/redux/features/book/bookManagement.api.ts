@@ -30,7 +30,7 @@ getAllBook: builder.query<{
     });
 
     return {
-      url: '/books?' + params.toString(),  // <-- query params in URL
+          url: `/books?${params.toString()}`,
       method: 'GET',
     };
   },
@@ -46,10 +46,11 @@ getAllBook: builder.query<{
 
 
 
+
   }),
 
 });
 
 
 
-export const { useAddBookMutation , useGetAllBookQuery } = bookManagementApi;
+export const { useAddBookMutation , useGetAllBookQuery, useGetFiltersBookQuery } = bookManagementApi;

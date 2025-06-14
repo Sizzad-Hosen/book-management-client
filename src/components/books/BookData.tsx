@@ -1,56 +1,85 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import BookCard from "../ui/BookCard";
-import { IBook } from "@/app/types/bookManage.type";
+import { IBook, Filters } from "@/app/types/bookManage.type";
 import { useGetAllBookQuery } from "@/redux/features/book/bookManagement.api";
+
+interface BookDataProps {
+  filters?: Filters;
+}
 
 const PAGE_SIZE = 10;
 
-const BookData: React.FC = () => {
+const BookData: React.FC<BookDataProps> = ({ filters = {} }) => {
+
   const [page, setPage] = useState(1);
+  
+  const queryParams = useMemo(() => {
+    return [
+      
+      { name: "page", value: page.toString() },
+      { name: "limit", value: PAGE_SIZE.toString() },
+      
+      ...Object.entries(filters)
+      .filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+      .map(([name, value]) => ({ name, value: String(value) })),
+    ];
+    
+  }, [page, filters]);
+  
+  const { data: bookData, isLoading, error } = useGetAllBookQuery(queryParams);
+  
+useEffect(() => {
+  console.log('Current page:', page);
+  console.log('Query Params:', queryParams);
+}, [page, queryParams]);
 
-  const { data:bookData, isLoading, error } = useGetAllBookQuery([
-    { name: "page", value: page },
-    { name: "limit", value: PAGE_SIZE },
-  ]);
-
- const books: IBook[] = bookData?.data.result || [];
 
 
-  const totalBooks = bookData?.data?.meta?.total || 0;
-  const totalPages = bookData?.data?.meta?.totalPages || Math.ceil(totalBooks / PAGE_SIZE);
 
-const handleNext = () => {
-  if (page < totalPages) {
-    console.log("Next clicked, old page:", page);
-    setPage(page + 1);
-  }
-};
-const handlePrev = () => {
-  if (page > 1) {
-    console.log("Prev clicked, old page:", page);
-    setPage(page - 1);
-  }
-};
+  const books: IBook[] = Array.isArray(bookData?.data)
+    ? bookData.data
+    : Array.isArray(bookData?.data?.books)
+    ? bookData.data.books
+    : [];
 
+  const totalBooks = bookData?.data?.total || 0;
+  const totalPages = bookData?.data?.totalPages || Math.ceil(totalBooks / PAGE_SIZE);
+
+  console.log(totalBooks)
+  console.log(totalPages)
+
+  const handleNext = () => {
+    console.log("clicking button", page)
+    if (page < totalPages) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (page > 1) {
+      setPage((prev) => prev - 1);
+    }
+  };
 
   if (isLoading) return <div>Loading books...</div>;
   if (error) return <div>Failed to load books.</div>;
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 bg-gray-100 min-h-screen py-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {books.length === 0 ? (
-          <div className="col-span-full text-center text-gray-500">
-            No books found.
-          </div>
-        ) : (
-          books.map((book: IBook) => <BookCard key={book.isbn || book.id} book={book} />)
-        )}
-      </div>
 
-      {/* Pagination */}
+  return (
+
+    <div className="mt-6 mx-auto max-w-7xl px-4">
+      {books.length === 0 ? (
+        <div className="text-center text-gray-500">No books found.</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {books.map((book) => (
+            <BookCard key={book.isbn || book.id} book={book} />
+          ))}
+        </div>
+      )}
+
       <div className="flex justify-center items-center space-x-4 mt-6">
         <button
           onClick={handlePrev}
@@ -64,13 +93,11 @@ const handlePrev = () => {
         </span>
         <button
           onClick={handleNext}
-         
+          disabled={page === totalPages || totalPages === 0}
           className="btn btn-secondary px-4 py-2 rounded"
         >
           Next
         </button>
-     
-
       </div>
     </div>
   );
