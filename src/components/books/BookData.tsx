@@ -13,6 +13,8 @@ const PAGE_SIZE = 10;
 
 const BookData: React.FC<BookDataProps> = ({ filters = {} }) => {
 
+  console.log("filters bookdata",filters)
+
   const [page, setPage] = useState(1);
   
   const queryParams = useMemo(() => {
@@ -31,11 +33,11 @@ const BookData: React.FC<BookDataProps> = ({ filters = {} }) => {
   const { data: bookData, isLoading, error } = useGetAllBookQuery(queryParams);
   
 useEffect(() => {
-  console.log('Current page:', page);
-  console.log('Query Params:', queryParams);
-}, [page, queryParams]);
 
+    console.log("Filters:", filters);
+    console.log("query params",queryParams)
 
+}, [page, queryParams,filters]);
 
 
   const books: IBook[] = Array.isArray(bookData?.data)
@@ -47,8 +49,6 @@ useEffect(() => {
   const totalBooks = bookData?.data?.total || 0;
   const totalPages = bookData?.data?.totalPages || Math.ceil(totalBooks / PAGE_SIZE);
 
-  console.log(totalBooks)
-  console.log(totalPages)
 
   const handleNext = () => {
     console.log("clicking button", page)

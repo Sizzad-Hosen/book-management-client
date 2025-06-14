@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Filters } from "@/app/types/bookManage.type";
 
 interface Props {
-  filters?: Filters; // ✅ optional for flexibility
+  filters: Filters;
   onFilterChange: (filters: Filters) => void;
 }
 
@@ -20,37 +20,39 @@ const defaultFilters: Filters = {
   format: "",
 };
 
-const inputStyle =
-  "peer w-full rounded-xl border border-gray-300 bg-transparent px-4 pt-4 pb-2 text-sm text-gray-800 placeholder-transparent focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500";
+const BookFilters: React.FC<Props> = ({ filters, onFilterChange }) => {
+  const [localFilters, setLocalFilters] = useState<Filters>(filters || defaultFilters);
 
-const labelStyle =
-  "absolute left-3 top-2 text-xs text-gray-500 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-500";
-
-const BookFilters: React.FC<Props> = ({ filters: initialFilters, onFilterChange }) => {
-  const [filters, setFilters] = useState<Filters>(initialFilters ?? defaultFilters);
-
+  // Update localFilters if parent filters change
   useEffect(() => {
-    setFilters(initialFilters ?? defaultFilters);
-  }, [initialFilters]);
+    setLocalFilters(filters || defaultFilters);
+  }, [filters]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    setLocalFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
-  
 
   const applyFilters = () => {
-    console.log(filters)
-    onFilterChange(filters);
+    onFilterChange(localFilters);
   };
 
   const clearFilters = () => {
-    setFilters(defaultFilters);
+    setLocalFilters(defaultFilters);
     onFilterChange(defaultFilters);
   };
 
+  const inputStyle =
+    "peer w-full rounded-xl border border-gray-300 bg-transparent px-4 pt-4 pb-2 text-sm text-gray-800 placeholder-transparent focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500";
+
+  const labelStyle =
+    "absolute left-3 top-2 text-xs text-gray-500 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-500";
+
   return (
-    <div className="bg-white shadow-xl max-w-7xl mx-auto px-4 p-6 rounded-2xl space-y-6">
+    <div className="bg-white shadow-xl px-4 p-6 rounded-2xl space-y-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-2">Filter Books</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -69,7 +71,7 @@ const BookFilters: React.FC<Props> = ({ filters: initialFilters, onFilterChange 
               id={name}
               name={name}
               type={type}
-              value={(filters as any)[name]}
+              value={localFilters[name as keyof Filters] || ""}
               onChange={handleChange}
               placeholder={label}
               className={inputStyle}
@@ -84,7 +86,7 @@ const BookFilters: React.FC<Props> = ({ filters: initialFilters, onFilterChange 
           <select
             id="format"
             name="format"
-            value={filters.format}
+            value={localFilters.format || ""}
             onChange={handleChange}
             className="select select-bordered w-full rounded-xl text-sm"
           >
